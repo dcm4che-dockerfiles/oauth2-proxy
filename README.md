@@ -38,7 +38,7 @@ Usage of oauth2-proxy:
       --custom-templates-dir string                path to custom html templates
       --display-htpasswd-form                      display username / password login form if an htpasswd file is provided (default true)
       --email-domain strings                       authenticate emails with the specified domain (may be given multiple times). Use * to authenticate any email
-      --errors-to-info-log                         Log errors to the standard logging channel instead of stderr
+      --errors-to-info-log                         Log errors to the standard logging channel instead of stderr
       --exclude-logging-path strings               Exclude logging requests to paths (eg: '/path1,/path2,/path3')
       --extra-jwt-issuers strings                  if skip-jwt-bearer-tokens is set, a list of extra JWT issuer=audience pairs (where the issuer URL has a .well-known/openid-configuration or a .well-known/jwks.json)
       --flush-interval duration                    period between response flushing when streaming responses (default 1s)
@@ -148,3 +148,6 @@ Usage of oauth2-proxy:
       --version                                    print version string
       --whitelist-domain strings                   allowed domains for redirection after authentication. Prefix domain with a . or a *. to allow subdomains (eg .example.com, *.example.com)
 ```
+
+Alternatively above options may also be specified by corresponding environment variables
+`OAUTH2_PROXY_{option-name-in captial-letters-and-underscores}`, e.g. `OAUTH2_PROXY_OIDC_ISSUER_URL` for `--oidc-issuer-url`.
