@@ -151,3 +151,6 @@ Usage of oauth2-proxy:
 
 Alternatively above options may also be specified by corresponding environment variables
 `OAUTH2_PROXY_{option-name-in captial-letters-and-underscores}`, e.g. `OAUTH2_PROXY_OIDC_ISSUER_URL` for `--oidc-issuer-url`.
+If the argument can be specified multiple times, the environment variable name should be plural (trailing S), e.g.
+`OAUTH2_PROXY_ALLOWED_ROLES` for `--allowed-role`.
+
