@@ -1,5 +1,5 @@
 ```console
-$ docker run --rm dcm4che/oauth2-proxy:7.5.1 --help
+$ docker run --rm dcm4che/oauth2-proxy:7.6.0 --help
 Usage of oauth2-proxy:
       --alpha-config string       path to alpha config file (use at your own risk - the structure in this config file may change between minor releases)
       --config string             path to config file
@@ -7,6 +7,7 @@ Usage of oauth2-proxy:
       --version                   print version string
 Usage of oauth2-proxy:
       --acr-values string                                   acr values string:  optional
+      --allow-query-semicolons                              allow the use of semicolons in query args
       --allowed-group strings                               restrict logins to members of this group (may be given multiple times)
       --allowed-role strings                                (keycloak-oidc) restrict logins to members of these roles (may be given multiple times)
       --alpha-config string                                 path to alpha config file (use at your own risk - the structure in this config file may change between minor releases)
@@ -17,6 +18,7 @@ Usage of oauth2-proxy:
       --authenticated-emails-file string                    authenticate against emails via file (one per line)
       --azure-graph-group-field id                          configures the group field to be used when building the groups list(id or `displayName`. Default is `id`) from Microsoft Graph(available only for v2.0 oidc url). Based on this value, the `allowed-group` config values should be adjusted accordingly. If using `id` as group field, `allowed-group` should contains groups IDs, if using `displayName` as group field, `allowed-group` should contains groups name
       --azure-tenant string                                 go to a tenant-specific or common (tenant-independent) endpoint. (default "common")
+      --backend-logout-url string                           url to perform a backend logout, {id_token} can be used as placeholder for the id_token
       --banner string                                       custom banner string. Use "-" to disable default banner.
       --basic-auth-password string                          the password to set when passing the HTTP Basic Auth header
       --bitbucket-repository string                         restrict logins to user with access to this repository
@@ -42,6 +44,7 @@ Usage of oauth2-proxy:
       --custom-templates-dir string                         path to custom html templates
       --display-htpasswd-form                               display username / password login form if an htpasswd file is provided (default true)
       --email-domain strings                                authenticate emails with the specified domain (may be given multiple times). Use * to authenticate any email
+      --encode-state                                        will encode oauth state with base64
       --errors-to-info-log                                  Log errors to the standard logging channel instead of stderr
       --exclude-logging-path strings                        Exclude logging requests to paths (eg: '/path1,/path2,/path3')
       --extra-jwt-issuers strings                           if skip-jwt-bearer-tokens is set, a list of extra JWT issuer=audience pairs (where the issuer URL has a .well-known/openid-configuration or a .well-known/jwks.json)
@@ -61,6 +64,7 @@ Usage of oauth2-proxy:
       --google-admin-email string                           the google admin to impersonate for api calls
       --google-group strings                                restrict logins to members of this google group (may be given multiple times).
       --google-service-account-json string                  the path to the service account json credentials
+      --google-target-principal string                      the target principal to impersonate when using ADC
       --google-use-application-default-credentials string   use application default credentials instead of service account json (i.e. GKE Workload Identity)
       --htpasswd-file string                                additionally authenticate against a htpasswd file. Entries must be created with "htpasswd -B" for bcrypt encryption
       --htpasswd-user-group strings                         the groups to be set on sessions for htpasswd users (may be given multiple times)
@@ -110,16 +114,18 @@ Usage of oauth2-proxy:
       --redeem-url string                                   Token redemption endpoint
       --redirect-url string                                 the OAuth Redirect URL. ie: "https://internalapp.yourcompany.com/oauth2/callback"
       --redis-ca-path string                                Redis custom CA path
-      --redis-cluster-connection-urls strings               List of Redis cluster connection URLs (eg redis://HOST[:PORT]). Used in conjunction with --redis-use-cluster
+      --redis-cluster-connection-urls strings               List of Redis cluster connection URLs (eg redis://[USER[:PASSWORD]@]HOST[:PORT]). Used in conjunction with --redis-use-cluster
       --redis-connection-idle-timeout int                   Redis connection idle timeout seconds, if Redis timeout option is non-zero, the --redis-connection-idle-timeout must be less then Redis timeout option
-      --redis-connection-url string                         URL of redis server for redis session storage (eg: redis://HOST[:PORT])
+      --redis-connection-url string                         URL of redis server for redis session storage (eg: redis://[USER[:PASSWORD]@]HOST[:PORT])
       --redis-insecure-skip-tls-verify                      Use insecure TLS connection to redis
       --redis-password --redis-connection-url               Redis password. Applicable for all Redis configurations. Will override any password set in --redis-connection-url
-      --redis-sentinel-connection-urls strings              List of Redis sentinel connection URLs (eg redis://HOST[:PORT]). Used in conjunction with --redis-use-sentinel
+      --redis-sentinel-connection-urls strings              List of Redis sentinel connection URLs (eg redis://[USER[:PASSWORD]@]HOST[:PORT]). Used in conjunction with --redis-use-sentinel
       --redis-sentinel-master-name string                   Redis sentinel master name. Used in conjunction with --redis-use-sentinel
       --redis-sentinel-password --redis-password            Redis sentinel password. Used only for sentinel connection; any redis node passwords need to use --redis-password
       --redis-use-cluster                                   Connect to redis cluster. Must set --redis-cluster-connection-urls to use this feature
       --redis-use-sentinel                                  Connect to redis via sentinels. Must set --redis-sentinel-master-name and --redis-sentinel-connection-urls to use this feature
+      --redis-username --redis-connection-url               Redis username. Applicable for Redis configurations where ACL has been configured. Will override any username set in --redis-connection-url
+      --relative-redirect-url                               allow relative OAuth Redirect URL.
       --request-id-header string                            Request header to use as the request ID (default "X-Request-Id")
       --request-logging                                     Log HTTP requests (default true)
       --request-logging-format string                       Template for HTTP request log lines (default "{{.Client}} - {{.RequestID}} - {{.Username}} [{{.Timestamp}}] {{.Host}} {{.RequestMethod}} {{.Upstream}} {{.RequestURI}} {{.Protocol}} {{.UserAgent}} {{.StatusCode}} {{.ResponseSize}} {{.RequestDuration}}")
@@ -138,6 +144,7 @@ Usage of oauth2-proxy:
       --skip-auth-regex strings                             (DEPRECATED for --skip-auth-route) bypass authentication for requests path's that match (may be given multiple times)
       --skip-auth-route strings                             bypass authentication for requests that match the method & path. Format: method=path_regex OR method!=path_regex. For all methods: path_regex OR !=path_regex
       --skip-auth-strip-headers                             strips X-Forwarded-* style authentication headers & Authorization header if they would be set by oauth2-proxy (default true)
+      --skip-claims-from-profile-url                        Skip loading missing claims from profile URL
       --skip-jwt-bearer-tokens                              will skip requests that have verified JWT bearer tokens (default false)
       --skip-oidc-discovery                                 Skip OIDC discovery and use manually supplied Endpoints
       --skip-provider-button                                will skip sign-in-page to directly reach the next step: oauth/start
@@ -152,6 +159,7 @@ Usage of oauth2-proxy:
       --trusted-ip strings                                  list of IPs or CIDR ranges to allow to bypass authentication. WARNING: trusting by IP has inherent security flaws, read the configuration documentation for more information.
       --upstream strings                                    the http url(s) of the upstream endpoint, file:// paths for static files or static://<status_code> for static response. Routing is based on the path
       --upstream-timeout duration                           maximum amount of time the server will wait for a response from the upstream (default 30s)
+      --use-system-trust-store                              Determines if 'provider-ca-file' files and the system trust store are used. If set to true, your custom CA files and the system trust store are used otherwise only your custom CA files.
       --user-id-claim oidc-email-claim                      (DEPRECATED for oidc-email-claim) which claim contains the user ID (default "email")
       --validate-url string                                 Access token validation endpoint
       --version                                             print version string

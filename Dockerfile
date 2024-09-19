@@ -1,4 +1,4 @@
-FROM quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
+FROM quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
 
 COPY certs /etc/certs
 COPY templates /templates
