@@ -1,5 +1,5 @@
 ```console
-$ docker run --rm dcm4che/oauth2-proxy:7.6.0 --help
+$ docker run --rm dcm4che/oauth2-proxy:7.7.1 --help
 Usage of oauth2-proxy:
       --alpha-config string       path to alpha config file (use at your own risk - the structure in this config file may change between minor releases)
       --config string             path to config file
